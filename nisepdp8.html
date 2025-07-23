@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>nisepdp8</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #222;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .panel-top {
+        display: block;
+        font-size: 2em;
+        font-weight: bold;
+        background-color: #ff6600;
+        border: 3px solid #ffa500;
+        color: #ffa500;
+    }
+
+    .lamp-title {
+      margin: 20px auto 10px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      font-size:small;
+    }
+
+    .lamp-title-3 {
+      width: 80px;
+      height: 20px;
+      border-bottom: 1px solid #888;
+    }
+
+    .lamp-title-12 {
+      width: 380px;
+      height: 20px;
+      border-bottom: 1px solid #888;
+    }
+
+    .lamp-panel {
+      margin: 10px auto 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .switch-panel, .control-panel {
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .nolamp {
+      width: 20px;
+      height: 20px;
+    }
+
+   .lamp {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background-color: #444; /* OFF */
+      box-shadow: 0 0 5px #000;
+    }
+
+    .lamp.on {
+      background-color: limegreen; /* ON */
+      box-shadow: 0 0 10px limegreen;
+    }
+
+    .switch {
+      width: 20px;
+      height: 50px;
+      background-color: #555;
+      cursor: pointer;
+    }
+
+    .switch.on {
+      background-color: orange;
+    }
+
+    .gap {
+      width: 0px;
+      height: 20px;
+    }
+
+    .control-button {
+      padding: 10px 15px;
+      background-color: #666;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .control-button:hover {
+      background-color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel-top">nisepdp8</div>
+
+  <!-- ランプ表示（12ビット） -->
+  <div class="lamp-title">
+    <div class="lamp-title-3">Data Field</div>
+    <div class="gap"></div>
+    <div class="lamp-title-3">Inst Field</div>
+    <div class="gap"></div>
+    <div class="lamp-title-12">Program Counter</div>
+  </div>
+  <div class="lamp-panel">
+    <div class="lamp" id="lampd0"></div>
+    <div class="lamp" id="lampd1"></div>
+    <div class="lamp" id="lampd2"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampi0"></div>
+    <div class="lamp" id="lampi1"></div>
+    <div class="lamp" id="lampi2"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lamp0"></div>
+    <div class="lamp" id="lamp1"></div>
+    <div class="lamp" id="lamp2"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lamp3"></div>
+    <div class="lamp" id="lamp4"></div>
+    <div class="lamp" id="lamp5"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lamp6"></div>
+    <div class="lamp" id="lamp7"></div>
+    <div class="lamp" id="lamp8"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lamp9"></div>
+    <div class="lamp" id="lamp10"></div>
+    <div class="lamp" id="lamp11"></div>
+  </div>
+
+  <div class="lamp-title">
+    <div class="lamp-title-3"></div>
+    <div class="gap"></div>
+    <div class="lamp-title-3"></div>
+    <div class="gap"></div>
+    <div class="lamp-title-12">Memory Address</div>
+  </div>
+  <div class="lamp-panel">
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="gap"></div>
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampma0"></div>
+    <div class="lamp" id="lampma1"></div>
+    <div class="lamp" id="lampma2"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampma3"></div>
+    <div class="lamp" id="lampma4"></div>
+    <div class="lamp" id="lampma5"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampma6"></div>
+    <div class="lamp" id="lampma7"></div>
+    <div class="lamp" id="lampma8"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampma9"></div>
+    <div class="lamp" id="lampma10"></div>
+    <div class="lamp" id="lampma11"></div>
+  </div>
+
+  <div class="lamp-title">
+    <div class="lamp-title-3"></div>
+    <div class="gap"></div>
+    <div class="lamp-title-3"></div>
+    <div class="gap"></div>
+    <div class="lamp-title-12">Memory Buffer</div>
+  </div>
+  <div class="lamp-panel">
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="gap"></div>
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampmb0"></div>
+    <div class="lamp" id="lampmb1"></div>
+    <div class="lamp" id="lampmb2"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampmb3"></div>
+    <div class="lamp" id="lampmb4"></div>
+    <div class="lamp" id="lampmb5"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampmb6"></div>
+    <div class="lamp" id="lampmb7"></div>
+    <div class="lamp" id="lampmb8"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampmb9"></div>
+    <div class="lamp" id="lampmb10"></div>
+    <div class="lamp" id="lampmb11"></div>
+  </div>
+
+  <div class="lamp-title">
+    <div class="lamp-title-3"></div>
+    <div class="gap"></div>
+    <div class="lamp-title-3">Link</div>
+    <div class="gap"></div>
+    <div class="lamp-title-12">Accumulator</div>
+  </div>
+  <div class="lamp-panel">
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="gap"></div>
+    <div class="nolamp"></div>
+    <div class="nolamp"></div>
+    <div class="lamp" id="lampl"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampac0"></div>
+    <div class="lamp" id="lampac1"></div>
+    <div class="lamp" id="lampac2"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampac3"></div>
+    <div class="lamp" id="lampac4"></div>
+    <div class="lamp" id="lampac5"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampac6"></div>
+    <div class="lamp" id="lampac7"></div>
+    <div class="lamp" id="lampac8"></div>
+    <div class="gap"></div>
+    <div class="lamp" id="lampac9"></div>
+    <div class="lamp" id="lampac10"></div>
+    <div class="lamp" id="lampac11"></div>
+  </div>
+
+  <!-- スイッチ群 -->
+  <div class="switch-panel">
+    <div class="switch" id="switchd0"></div>
+    <div class="switch" id="switchd1"></div>
+    <div class="switch" id="switchd2"></div>
+    <div class="gap"></div>
+    <div class="switch" id="switchi0"></div>
+    <div class="switch" id="switchi1"></div>
+    <div class="switch" id="switchi2"></div>
+    <div class="gap"></div>
+    <div class="switch" id="switch0"></div>
+    <div class="switch" id="switch1"></div>
+    <div class="switch" id="switch2"></div>
+    <div class="gap"></div>
+    <div class="switch" id="switch3"></div>
+    <div class="switch" id="switch4"></div>
+    <div class="switch" id="switch5"></div>
+    <div class="gap"></div>
+    <div class="switch" id="switch6"></div>
+    <div class="switch" id="switch7"></div>
+    <div class="switch" id="switch8"></div>
+    <div class="gap"></div>
+    <div class="switch" id="switch9"></div>
+    <div class="switch" id="switch10"></div>
+    <div class="switch" id="switch11"></div>
+  </div>
+
+  <!-- 操作キー群 -->
+  <div class="control-panel">
+    <button class="control-button" id="start">Start</button>
+    <button class="control-button" id="loadadd">LoadAdd</button>
+    <button class="control-button" id="dep">Dep</button>
+    <button class="control-button" id="exam">Exaｍ</button>
+    <button class="control-button" id="cont">Cont</button>
+    <button class="control-button" id="stop">Stop</button>
+    <button class="control-button" id="step">SingStep</button>
+  </div>
+
+  <script>
+    var RUNFF = 0;
+    var DF,IF,PC,MA,MB,L,AC,IR;
+    var FIELD = [];
+    for(var i=0; i<8; i++) FIELD.push(Array(4096).fill(0));
+
+    // スイッチのON/OFFを切り替える
+    for (let i = 0; i < 3; i++) {
+      const sw = document.getElementById(`switchd${i}`);
+      sw.addEventListener('click', () => {
+        sw.classList.toggle('on');
+      });
+    }
+    for (let i = 0; i < 3; i++) {
+      const sw = document.getElementById(`switchi${i}`);
+      sw.addEventListener('click', () => {
+        sw.classList.toggle('on');
+      });
+    }
+    for (let i = 0; i < 12; i++) {
+      const sw = document.getElementById(`switch${i}`);
+      sw.addEventListener('click', () => {
+        sw.classList.toggle('on');
+      });
+    }
+
+    // スイッチの状態を取得
+    function getSwitchValue() {
+      let value = 0;
+      for (let i = 0; i < 12; i++) {
+        const sw = document.getElementById(`switch${i}`);
+        if (sw.classList.contains('on')) {
+          value |= (1 << (11 - i));
+        }
+      }
+      return value;
+    }
+
+    function getDFSwitchValue() {
+      let value = 0;
+      for (let i = 0; i < 3; i++) {
+        const sw = document.getElementById(`switchd${i}`);
+        if (sw.classList.contains('on')) {
+          value |= (1 << (2 - i));
+        }
+      }
+      return value;
+    }
+
+    function getIFSwitchValue() {
+      let value = 0;
+      for (let i = 0; i < 3; i++) {
+        const sw = document.getElementById(`switchi${i}`);
+        if (sw.classList.contains('on')) {
+          value |= (1 << (2 - i));
+        }
+      }
+      return value;
+    }
+
+    // ランプに値を反映
+    function setDFRegisterValue(value) {
+      for (let i = 0; i < 3; i++) {
+        const lamp = document.getElementById(`lampd${i}`);
+        if (value & (1 << (2 - i))) {
+          lamp.classList.add('on');
+        } else {
+          lamp.classList.remove('on');
+        }
+      }
+    }
+    function setIFRegisterValue(value) {
+      for (let i = 0; i < 3; i++) {
+        const lamp = document.getElementById(`lampi${i}`);
+        if (value & (1 << (2 - i))) {
+          lamp.classList.add('on');
+        } else {
+          lamp.classList.remove('on');
+        }
+      }
+    }
+    function setPCRegisterValue(value) {
+      for (let i = 0; i < 12; i++) {
+        const lamp = document.getElementById(`lamp${i}`);
+        if (value & (1 << (11 - i))) {
+          lamp.classList.add('on');
+        } else {
+          lamp.classList.remove('on');
+        }
+      }
+    }
+    function setMARegisterValue(value) {
+      for (let i = 0; i < 12; i++) {
+        const lamp = document.getElementById(`lampma${i}`);
+        if (value & (1 << (11 - i))) {
+          lamp.classList.add('on');
+        } else {
+          lamp.classList.remove('on');
+        }
+      }
+    }
+    function setMBRegisterValue(value) {
+      for (let i = 0; i < 12; i++) {
+        const lamp = document.getElementById(`lampmb${i}`);
+        if (value & (1 << (11 - i))) {
+          lamp.classList.add('on');
+        } else {
+          lamp.classList.remove('on');
+        }
+      }
+    }
+    function setLRegisterValue(value) {
+        const lamp = document.getElementById(`lampl`);
+        if (value) {
+          lamp.classList.add('on');
+        } else {
+          lamp.classList.remove('on');
+        }
+    }
+    function setACRegisterValue(value) {
+      for (let i = 0; i < 12; i++) {
+        const lamp = document.getElementById(`lampac${i}`);
+        if (value & (1 << (11 - i))) {
+          lamp.classList.add('on');
+        } else {
+          lamp.classList.remove('on');
+        }
+      }
+    }
+
+    // レジスタ ---> ランプ
+    function setLamp() {
+      setDFRegisterValue(DF);
+      setIFRegisterValue(IF);
+      setPCRegisterValue(PC);
+
+      setMARegisterValue(MA);
+      setMBRegisterValue(MB);
+
+      setLRegisterValue(L);
+      setACRegisterValue(AC);
+    }
+
+    // FIELD (Memory)
+    function writeField(fieldNo, value) {
+      FIELD[fieldNo][MA] = MB;
+    }
+    function readField(fieldNo) {
+      return FIELD[fieldNo][MA];
+    }
+
+    // 操作キー：Start
+    document.getElementById('start').addEventListener('click', () => {
+      AC = 0;
+      L = 0;
+      MB = 0;
+      IR = 0;
+      MA = PC;
+      RUNFF = 1;
+      alert('Start動作は未実装です');
+    });
+
+    // 操作キー：LoadAdd
+    document.getElementById('loadadd').addEventListener('click', () => {
+      PC = getSwitchValue();
+      DF = getDFSwitchValue();
+      IF = getIFSwitchValue();
+      setLamp();
+    });
+
+    // 操作キー：Dep (Deposit)
+    document.getElementById('dep').addEventListener('click', () => {
+      MB = getSwitchValue();
+      MA = PC;
+      FIELD[DF][MA] = MB;
+      PC++;
+      setLamp();
+    });
+
+    // 操作キー：Exam
+    document.getElementById('exam').addEventListener('click', () => {
+      MA = PC;
+      MB = FIELD[DF][MA];
+      PC++;
+      setLamp();
+    });
+
+    // 操作キー：Cont (Continue)
+    document.getElementById('cont').addEventListener('click', () => {
+      alert('Cont動作は未実装です');
+    });
+
+    // 操作キー：Stop
+    document.getElementById('stop').addEventListener('click', () => {
+      RUNFF = 0;
+    });
+
+    // 操作キー：Step
+    document.getElementById('step').addEventListener('click', () => {
+      alert('Step動作は未実装です');
+    });
+
+  </script>
+</body>
+</html>
