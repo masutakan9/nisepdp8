@@ -284,20 +284,21 @@
     for(var i=0; i<8; i++) FIELD.push(Array(4096).fill(0));
 
     // スイッチのON/OFFを切り替える
-    for (let i = 0; i < 3; i++) {
-      const sw = document.getElementById(`switchd${i}`);
+    for (var i = 0; i < 3; i++) {
+      var id = 'switchd' + i;
+      var sw = document.getElementById(id);
       sw.addEventListener('click', () => {
         sw.classList.toggle('on');
       });
     }
-    for (let i = 0; i < 3; i++) {
-      const sw = document.getElementById(`switchi${i}`);
+    for (var i = 0; i < 3; i++) {
+      var sw = document.getElementById(`switchi${i}`);
       sw.addEventListener('click', () => {
         sw.classList.toggle('on');
       });
     }
-    for (let i = 0; i < 12; i++) {
-      const sw = document.getElementById(`switch${i}`);
+    for (var i = 0; i < 12; i++) {
+      var sw = document.getElementById(`switch${i}`);
       sw.addEventListener('click', () => {
         sw.classList.toggle('on');
       });
@@ -305,9 +306,9 @@
 
     // スイッチの状態を取得
     function getSwitchValue() {
-      let value = 0;
-      for (let i = 0; i < 12; i++) {
-        const sw = document.getElementById(`switch${i}`);
+      var value = 0;
+      for (var i = 0; i < 12; i++) {
+        var sw = document.getElementById(`switch${i}`);
         if (sw.classList.contains('on')) {
           value |= (1 << (11 - i));
         }
@@ -316,9 +317,9 @@
     }
 
     function getDFSwitchValue() {
-      let value = 0;
-      for (let i = 0; i < 3; i++) {
-        const sw = document.getElementById(`switchd${i}`);
+      var value = 0;
+      for (var i = 0; i < 3; i++) {
+        var sw = document.getElementById(`switchd${i}`);
         if (sw.classList.contains('on')) {
           value |= (1 << (2 - i));
         }
@@ -327,9 +328,9 @@
     }
 
     function getIFSwitchValue() {
-      let value = 0;
-      for (let i = 0; i < 3; i++) {
-        const sw = document.getElementById(`switchi${i}`);
+      var value = 0;
+      for (var i = 0; i < 3; i++) {
+        var sw = document.getElementById(`switchi${i}`);
         if (sw.classList.contains('on')) {
           value |= (1 << (2 - i));
         }
@@ -339,8 +340,8 @@
 
     // ランプに値を反映
     function setDFRegisterValue(value) {
-      for (let i = 0; i < 3; i++) {
-        const lamp = document.getElementById(`lampd${i}`);
+      for (var i = 0; i < 3; i++) {
+        var lamp = document.getElementById(`lampd${i}`);
         if (value & (1 << (2 - i))) {
           lamp.classList.add('on');
         } else {
@@ -349,8 +350,8 @@
       }
     }
     function setIFRegisterValue(value) {
-      for (let i = 0; i < 3; i++) {
-        const lamp = document.getElementById(`lampi${i}`);
+      for (var i = 0; i < 3; i++) {
+        var lamp = document.getElementById(`lampi${i}`);
         if (value & (1 << (2 - i))) {
           lamp.classList.add('on');
         } else {
@@ -359,8 +360,8 @@
       }
     }
     function setPCRegisterValue(value) {
-      for (let i = 0; i < 12; i++) {
-        const lamp = document.getElementById(`lamp${i}`);
+      for (var i = 0; i < 12; i++) {
+        var lamp = document.getElementById(`lamp${i}`);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
         } else {
@@ -369,8 +370,8 @@
       }
     }
     function setMARegisterValue(value) {
-      for (let i = 0; i < 12; i++) {
-        const lamp = document.getElementById(`lampma${i}`);
+      for (var i = 0; i < 12; i++) {
+        var lamp = document.getElementById(`lampma${i}`);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
         } else {
@@ -379,8 +380,8 @@
       }
     }
     function setMBRegisterValue(value) {
-      for (let i = 0; i < 12; i++) {
-        const lamp = document.getElementById(`lampmb${i}`);
+      for (var i = 0; i < 12; i++) {
+        var lamp = document.getElementById(`lampmb${i}`);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
         } else {
@@ -389,7 +390,7 @@
       }
     }
     function setLRegisterValue(value) {
-        const lamp = document.getElementById(`lampl`);
+        var lamp = document.getElementById(`lampl`);
         if (value) {
           lamp.classList.add('on');
         } else {
@@ -397,8 +398,8 @@
         }
     }
     function setACRegisterValue(value) {
-      for (let i = 0; i < 12; i++) {
-        const lamp = document.getElementById(`lampac${i}`);
+      for (var i = 0; i < 12; i++) {
+        var lamp = document.getElementById(`lampac${i}`);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
         } else {
