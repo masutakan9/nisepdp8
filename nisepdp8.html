@@ -335,7 +335,7 @@
       var value = 0;
       for (var i = 0; i < 3; i++) {
         var id = 'switchi' + i;
-        var sw = document.getElementById(`switchi${i}`);
+        var sw = document.getElementById(id);
         if (sw.classList.contains('on')) {
           value |= (1 << (2 - i));
         }
@@ -391,7 +391,7 @@
     function setMBRegisterValue(value) {
       for (var i = 0; i < 12; i++) {
       var id = 'switchd' + i;
-        var lamp = document.getElementById(`lampmb${i}`);
+        var lamp = document.getElementById(id);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
         } else {
@@ -401,7 +401,7 @@
     }
     function setLRegisterValue(value) {
       var id = 'switchd' + i;
-        var lamp = document.getElementById(`lampl`);
+        var lamp = document.getElementById(id);
         if (value) {
           lamp.classList.add('on');
         } else {
