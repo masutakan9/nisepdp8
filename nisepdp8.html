@@ -281,7 +281,9 @@
     var RUNFF = 0;
     var DF,IF,PC,MA,MB,L,AC,IR;
     var FIELD = [];
-    for(var i=0; i<8; i++) FIELD.push(Array(4096).fill(0));
+    for(var i=0; i<8; i++) {
+      FIELD[i] = new Uint16Array(4096);
+    }
 
     // スイッチのON/OFFを切り替える
     for (var i = 0; i < 3; i++) {
