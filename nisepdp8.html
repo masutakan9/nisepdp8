@@ -287,19 +287,21 @@
     for (var i = 0; i < 3; i++) {
       var id = 'switchd' + i;
       var sw = document.getElementById(id);
-      sw.addEventListener('click', () => {
+      sw.addEventListener('click', function() {
         sw.classList.toggle('on');
       });
     }
     for (var i = 0; i < 3; i++) {
-      var sw = document.getElementById(`switchi${i}`);
-      sw.addEventListener('click', () => {
+      var id = 'switchi' + i;
+      var sw = document.getElementById(id);
+      sw.addEventListener('click', function() {
         sw.classList.toggle('on');
       });
     }
     for (var i = 0; i < 12; i++) {
-      var sw = document.getElementById(`switch${i}`);
-      sw.addEventListener('click', () => {
+      var id = 'switch' + i;
+      var sw = document.getElementById(id);
+      sw.addEventListener('click', function() {
         sw.classList.toggle('on');
       });
     }
@@ -308,7 +310,8 @@
     function getSwitchValue() {
       var value = 0;
       for (var i = 0; i < 12; i++) {
-        var sw = document.getElementById(`switch${i}`);
+        var id = 'switchd' + i;
+        var sw = document.getElementById(id);
         if (sw.classList.contains('on')) {
           value |= (1 << (11 - i));
         }
@@ -319,7 +322,8 @@
     function getDFSwitchValue() {
       var value = 0;
       for (var i = 0; i < 3; i++) {
-        var sw = document.getElementById(`switchd${i}`);
+        var id = 'switchd' + i;
+        var sw = document.getElementById(id);
         if (sw.classList.contains('on')) {
           value |= (1 << (2 - i));
         }
@@ -330,6 +334,7 @@
     function getIFSwitchValue() {
       var value = 0;
       for (var i = 0; i < 3; i++) {
+        var id = 'switchi' + i;
         var sw = document.getElementById(`switchi${i}`);
         if (sw.classList.contains('on')) {
           value |= (1 << (2 - i));
@@ -341,7 +346,8 @@
     // ランプに値を反映
     function setDFRegisterValue(value) {
       for (var i = 0; i < 3; i++) {
-        var lamp = document.getElementById(`lampd${i}`);
+        var id = 'lampd' + i;
+        var lamp = document.getElementById(id);
         if (value & (1 << (2 - i))) {
           lamp.classList.add('on');
         } else {
@@ -351,7 +357,8 @@
     }
     function setIFRegisterValue(value) {
       for (var i = 0; i < 3; i++) {
-        var lamp = document.getElementById(`lampi${i}`);
+        var id = 'lampi' + i;
+        var lamp = document.getElementById(id);
         if (value & (1 << (2 - i))) {
           lamp.classList.add('on');
         } else {
@@ -361,7 +368,8 @@
     }
     function setPCRegisterValue(value) {
       for (var i = 0; i < 12; i++) {
-        var lamp = document.getElementById(`lamp${i}`);
+        var id = 'lamp' + i;
+        var lamp = document.getElementById(id);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
         } else {
@@ -371,7 +379,8 @@
     }
     function setMARegisterValue(value) {
       for (var i = 0; i < 12; i++) {
-        var lamp = document.getElementById(`lampma${i}`);
+        var id = 'lampma' + i;
+        var lamp = document.getElementById(id);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
         } else {
@@ -381,6 +390,7 @@
     }
     function setMBRegisterValue(value) {
       for (var i = 0; i < 12; i++) {
+      var id = 'switchd' + i;
         var lamp = document.getElementById(`lampmb${i}`);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
@@ -390,6 +400,7 @@
       }
     }
     function setLRegisterValue(value) {
+      var id = 'switchd' + i;
         var lamp = document.getElementById(`lampl`);
         if (value) {
           lamp.classList.add('on');
@@ -399,7 +410,8 @@
     }
     function setACRegisterValue(value) {
       for (var i = 0; i < 12; i++) {
-        var lamp = document.getElementById(`lampac${i}`);
+        var id = 'lampac' + i;
+        var lamp = document.getElementById(id);
         if (value & (1 << (11 - i))) {
           lamp.classList.add('on');
         } else {
@@ -430,7 +442,7 @@
     }
 
     // 操作キー：Start
-    document.getElementById('start').addEventListener('click', () => {
+    document.getElementById('start').addEventListener('click', function() {
       AC = 0;
       L = 0;
       MB = 0;
@@ -441,7 +453,7 @@
     });
 
     // 操作キー：LoadAdd
-    document.getElementById('loadadd').addEventListener('click', () => {
+    document.getElementById('loadadd').addEventListener('click', function() {
       PC = getSwitchValue();
       DF = getDFSwitchValue();
       IF = getIFSwitchValue();
@@ -449,7 +461,7 @@
     });
 
     // 操作キー：Dep (Deposit)
-    document.getElementById('dep').addEventListener('click', () => {
+    document.getElementById('dep').addEventListener('click', function() {
       MB = getSwitchValue();
       MA = PC;
       FIELD[DF][MA] = MB;
@@ -458,7 +470,7 @@
     });
 
     // 操作キー：Exam
-    document.getElementById('exam').addEventListener('click', () => {
+    document.getElementById('exam').addEventListener('click', function() {
       MA = PC;
       MB = FIELD[DF][MA];
       PC++;
@@ -466,17 +478,17 @@
     });
 
     // 操作キー：Cont (Continue)
-    document.getElementById('cont').addEventListener('click', () => {
+    document.getElementById('cont').addEventListener('click', function() {
       alert('Cont動作は未実装です');
     });
 
     // 操作キー：Stop
-    document.getElementById('stop').addEventListener('click', () => {
+    document.getElementById('stop').addEventListener('click', function() {
       RUNFF = 0;
     });
 
     // 操作キー：Step
-    document.getElementById('step').addEventListener('click', () => {
+    document.getElementById('step').addEventListener('click', function() {
       alert('Step動作は未実装です');
     });
 
