@@ -283,7 +283,7 @@
 
   <script>
     var RUNFF = 0;
-    var DF,IF,PC,MA,MB,L,AC,IR;
+    var DF,IF,PC,MA,MB,L,AC,IR,I,Z;
     var FIELD = [];
     for(var i=0; i<8; i++) {
       FIELD[i] = new Uint16Array(4096);
@@ -451,23 +451,239 @@
       setACRegisterValue(AC);
     }
 
-    // FIELD (Memory)
-    function writeField(fieldNo, value) {
-      FIELD[fieldNo][MA] = MB;
+    // 実行
+    function doStep() {
+
+      MA = PC;
+
+      // FETCH state
+
+      PC++;
+      MB = FIELD[IF][MA];
+      IR = MB >> 9;
+
+      I = MB & 256;   // indirect
+      Z = MB & 128;   // zero page
+
+      MA = (MA & 3968) + (MB & 127);  // 3968 = 07600
+      if (Z == 0) {
+        // zero page
+        MA = MA & 127;
+      }
+
+      var fieldNo = IF;
+      if (I != 0) {
+        // DEFER state
+        // Autoindex Addressing (0010..0017)
+        if ((MA >= 8) && (MA <= 15)) {
+          FIELD[IF][MA]++;
+        }
+        MA = FIELD[IF][MA];
+        fieldNo = DF;
+      }
+      
+      //EXECUTE state
+      SENSE = 0 + FIELD[fieldNo][MA];
+
+      switch(IR) {
+        case 0: // AND
+          AC &= SENSE;
+          break;
+        case 1: // TAD
+          if (SENSE & 2048) {
+            SENSE = SENSE - 4096;
+          }
+          if (AC & 2048) {
+            AC = AC - 4096;
+          }
+          AC = AC + SENSE + L;
+          L = (AC & 4096) >> 12;
+          AC &= 4095;
+          break;
+        case 2: // ISZ
+          SENSE = SENSE + 1;
+          FIELD[fieldNo][MA] = SENSE;
+          if (SENSE == 0) {
+            PC = PC + 1;
+          }
+          break;
+        case 3: // DCA
+          FIELD[fieldNo][MA] = AC;
+          AC = 0;
+          break;
+        case 4: // JMS
+          FIELD[IF][MA] = PC;
+          PC = MA + 1;
+          break;
+        case 5: // JMP
+          PC = MA;
+          break;
+        case 6: // IOT
+          break;
+        case 7: // OPR
+          if ((MB & 256) == 0) {
+            // GROUP 1
+            doGroup1(MB);
+          }
+          else {
+            if ((MB & 1) == 0) {
+              if ((MB & 8) == 0) {
+                // GROUP 2 OR
+                doGroup2or(MB);
+              }
+              else {
+                // GROUP 2 AND
+                doGroup2and(MB);
+              }
+            }
+            else {
+              // GROUP 3
+              doGroup3(MB);
+            }
+          }
+          break;
+        default:
+          console.log('illegal instruction: ' + IR);
+          break;
+      }
     }
-    function readField(fieldNo) {
-      return FIELD[fieldNo][MA];
+    // OPR
+    function doGroup1(m) {
+      if (m & 128) {  // CLA
+        AC = 0;
+      }
+      if (m & 64) { // CLL
+        L = 0;
+      }
+      if (m & 32) { // CMA
+        AC = (~AC) & 4095;
+      }
+      if (m & 16) { // CML
+        L = (~L) & 1;
+      }
+      if (m & 1) {  // IAC
+        AC = (AC + 1) & 4095;
+      }
+      if (m & 8) {  // RAR
+        AC = AC | (L << 12);
+        L = AC & 1;
+        AC = AC >> 1;
+        if (m & 2) {  // BSW
+          AC = AC | (L << 12);
+          L = AC & 1;
+          AC = AC >> 1;
+        }        
+      }
+      if (m & 4) {  // RAL
+        AC = AC << 1 | L;
+        L = AC >> 12;
+        AC = AC & 4095;
+        if (m & 2) {  // BSW
+          AC = AC << 1 | L;
+          L = AC >> 12;
+          AC = AC & 4095;
+        }
+      }
+      if ((m & 14) == 2) {  // BSW
+        AC = ((AC << 6) & 4095) + (AC >> 6);
+      }
+    }
+    function doGroup2or(m) {
+      if (m & 64) {   // SMA
+        if (AC & 2048) {
+          PC = PC + 1;
+        }
+      }
+      if (m & 32) {   // SZA
+        if (AC == 0) {
+          PC = PC + 1;
+        }
+      }
+      if (m & 8) {    // SNL
+        if (L) {
+          PC = PC + 1;
+        }
+      }
+      if (m & 128) {  // CLA
+        AC = 0;
+      }
+      if (m & 4) {    // OSR
+        AC = AC | getSwitchValue();
+      }
+      if (m & 2) {    // HLT
+        RUNFF = 0;
+      }
+    }
+    function doGroup2and(m) {
+      var skip = 1;
+      if (m & 64) {   // SPA
+        if (AC & 2048) {
+          skip = 0;
+        }
+      }
+      if (m & 32) {   // SNA
+        if (AC == 0) {
+          skip = 0;
+        }
+      }
+      if (m & 16) {   // SZL
+        if (L) {
+          skip = 0;
+        }
+      }
+      if (skip) {
+        PC = PC + 1;
+      }
+      if (m & 128) {    // CLA
+        AC = 0;
+      }
+      if (m & 2) {    // HLT
+        RUNFF = 0;
+      }
+      if (m & 4) {    // OSR
+        AC = AC | getSwitchValue();
+      }
+    }
+    function doGroup3(m) {
+      if (m & 128) {  // CLA
+        AC = 0;
+      }
+      if (m & 64) {   // MQA
+      }
+      if (m & 32) {   // SCA
+      }
+      if (m & 16) {   // MQL
+      }
+      if (m & 814 {    // CODE 
+      }
+    }
+    function regDump() {
+      console.log('     L:' + L);
+      console.log('    AC:' + OCT2STR12(AC));
+      console.log('    PC:' + OCT2STR12(PC));
+      console.log('    MA:' + OCT2STR12(MA));
+      console.log('    MB:' + OCT2STR12(MB));
+      console.log('    DF:' + OCT2STR12(DF));
+      console.log('    IF:' + OCT2STR12(IF));
+    }
+    function OCT2STR12(oct) {
+      return ''.concat((oct >> 9), ((oct >> 6) & 7), ((oct >> 3) & 7), (oct & 7));
     }
 
     // 操作キー：Start
     document.getElementById('start').addEventListener('click', function() {
+      if (RUNFF == 1) {return};
+
       AC = 0;
       L = 0;
       MB = 0;
       IR = 0;
       MA = PC;
       RUNFF = 1;
-      alert('Start動作は未実装です');
+
+      while (RUNFF == 1) {
+        doStep();
+      }
     });
 
     // 操作キー：LoadAdd
@@ -482,7 +698,7 @@
     document.getElementById('dep').addEventListener('click', function() {
       MB = getSwitchValue();
       MA = PC;
-      FIELD[DF][MA] = MB;
+      FIELD[IF][MA] = MB;
       PC++;
       setLamp();
     });
@@ -490,7 +706,7 @@
     // 操作キー：Exam
     document.getElementById('exam').addEventListener('click', function() {
       MA = PC;
-      MB = FIELD[DF][MA];
+      MB = FIELD[IF][MA];
       PC++;
       setLamp();
     });
@@ -507,7 +723,7 @@
 
     // 操作キー：Step
     document.getElementById('step').addEventListener('click', function() {
-      alert('Step動作は未実装です');
+        doStep();
     });
 
   </script>
