@@ -22,42 +22,42 @@
     }
 
     .lamp-title {
-      margin: 20px auto 10px;
+      margin: 20px 10px 10px;
       display: flex;
       justify-content: center;
-      gap: 10px;
       font-size:small;
     }
 
     .lamp-title-3 {
+      margin: 0 5px;
       width: 80px;
       height: 20px;
-      border-bottom: 1px solid #888;
+      border-bottom: 3px solid #888;
     }
 
     .lamp-title-12 {
+      margin: 0 5px;
       width: 380px;
       height: 20px;
-      border-bottom: 1px solid #888;
+      border-bottom: 3px solid #888;
     }
 
     .lamp-panel {
-      margin: 10px auto 20px;
+      margin: 10px 10px 20px;
       display: flex;
       justify-content: center;
-      gap: 10px;
     }
 
     .switch-panel, .control-panel {
-      margin: 20px auto;
+      margin: 20px 5px;
       display: flex;
       justify-content: center;
-      gap: 10px;
     }
 
     .nolamp {
       width: 20px;
       height: 20px;
+      margin: 0 5px;
     }
 
    .lamp {
@@ -66,6 +66,7 @@
       border-radius: 50%;
       background-color: #444; /* OFF */
       box-shadow: 0 0 5px #000;
+      margin: 0 5px;
     }
 
     .lamp.on {
@@ -77,6 +78,7 @@
       width: 20px;
       height: 50px;
       background-color: #555;
+      margin: 0 5px;
       cursor: pointer;
     }
 
@@ -87,6 +89,7 @@
     .gap {
       width: 0px;
       height: 20px;
+      margin: 0 5px;
     }
 
     .control-button {
@@ -95,6 +98,7 @@
       border: none;
       border-radius: 4px;
       color: white;
+      margin: 0 10px;
       cursor: pointer;
     }
 
@@ -271,7 +275,7 @@
     <button class="control-button" id="start">Start</button>
     <button class="control-button" id="loadadd">LoadAdd</button>
     <button class="control-button" id="dep">Dep</button>
-    <button class="control-button" id="exam">Exaｍ</button>
+    <button class="control-button" id="exam">Exam</button>
     <button class="control-button" id="cont">Cont</button>
     <button class="control-button" id="stop">Stop</button>
     <button class="control-button" id="step">SingStep</button>
@@ -287,36 +291,41 @@
 
     // スイッチのON/OFFを切り替える
     for (var i = 0; i < 3; i++) {
-      var id = 'switchd' + i;
-      var sw = document.getElementById(id);
-      sw.addEventListener('click', function() {
-        sw.classList.toggle('on');
-      });
+      (function(n){
+        var sw = document.getElementById('switchd' + n);
+        sw.addEventListener('click', function() {
+          sw.classList.toggle('on');
+        });
+
+      })(i);
     }
     for (var i = 0; i < 3; i++) {
-      var id = 'switchi' + i;
-      var sw = document.getElementById(id);
-      sw.addEventListener('click', function() {
-        sw.classList.toggle('on');
-      });
+      (function(n){
+        var sw = document.getElementById('switchi' + n);
+        sw.addEventListener('click', function() {
+          sw.classList.toggle('on');
+        });
+      })(i);
     }
     for (var i = 0; i < 12; i++) {
-      var id = 'switch' + i;
-      var sw = document.getElementById(id);
-      sw.addEventListener('click', function() {
-        sw.classList.toggle('on');
-      });
+      (function(n){
+        var sw = document.getElementById('switch' + n);
+        sw.addEventListener('click', function() {
+          sw.classList.toggle('on');
+        });
+      })(i);
     }
 
     // スイッチの状態を取得
     function getSwitchValue() {
       var value = 0;
       for (var i = 0; i < 12; i++) {
-        var id = 'switchd' + i;
-        var sw = document.getElementById(id);
-        if (sw.classList.contains('on')) {
-          value |= (1 << (11 - i));
-        }
+        value |= (function(n){
+          var sw = document.getElementById('switch' + n);
+          if (sw.classList.contains('on')) {
+            return (1 << (11 - i));
+          }
+        })(i);
       }
       return value;
     }
@@ -324,11 +333,12 @@
     function getDFSwitchValue() {
       var value = 0;
       for (var i = 0; i < 3; i++) {
-        var id = 'switchd' + i;
-        var sw = document.getElementById(id);
-        if (sw.classList.contains('on')) {
-          value |= (1 << (2 - i));
-        }
+        value |= (function(n){
+          var sw = document.getElementById('switchd' + n);
+          if (sw.classList.contains('on')) {
+            return (1 << (2 - i));
+          }
+        })(i);
       }
       return value;
     }
@@ -336,11 +346,12 @@
     function getIFSwitchValue() {
       var value = 0;
       for (var i = 0; i < 3; i++) {
-        var id = 'switchi' + i;
-        var sw = document.getElementById(id);
-        if (sw.classList.contains('on')) {
-          value |= (1 << (2 - i));
-        }
+        value |= (function(n){
+          var sw = document.getElementById('switchi' + n);
+          if (sw.classList.contains('on')) {
+            return (1 << (2 - i));
+          }
+        })(i);
       }
       return value;
     }
@@ -348,62 +359,66 @@
     // ランプに値を反映
     function setDFRegisterValue(value) {
       for (var i = 0; i < 3; i++) {
-        var id = 'lampd' + i;
-        var lamp = document.getElementById(id);
-        if (value & (1 << (2 - i))) {
-          lamp.classList.add('on');
-        } else {
-          lamp.classList.remove('on');
-        }
+        (function(n){
+          var lamp = document.getElementById('lampd' + n);
+          if (value & (1 << (2 - i))) {
+            lamp.classList.add('on');
+          } else {
+            lamp.classList.remove('on');
+          }
+        })(i);
       }
     }
     function setIFRegisterValue(value) {
       for (var i = 0; i < 3; i++) {
-        var id = 'lampi' + i;
-        var lamp = document.getElementById(id);
-        if (value & (1 << (2 - i))) {
-          lamp.classList.add('on');
-        } else {
-          lamp.classList.remove('on');
-        }
+        (function(n){
+          var lamp = document.getElementById('lampi' + n);
+          if (value & (1 << (2 - i))) {
+            lamp.classList.add('on');
+          } else {
+            lamp.classList.remove('on');
+          }
+        })(i);
       }
     }
     function setPCRegisterValue(value) {
       for (var i = 0; i < 12; i++) {
-        var id = 'lamp' + i;
-        var lamp = document.getElementById(id);
-        if (value & (1 << (11 - i))) {
-          lamp.classList.add('on');
-        } else {
-          lamp.classList.remove('on');
-        }
+        (function(n){
+          var lamp = document.getElementById('lamp' + n);
+          if (value & (1 << (11 - i))) {
+            lamp.classList.add('on');
+          } else {
+            lamp.classList.remove('on');
+          }
+        })(i);
       }
     }
     function setMARegisterValue(value) {
       for (var i = 0; i < 12; i++) {
-        var id = 'lampma' + i;
-        var lamp = document.getElementById(id);
-        if (value & (1 << (11 - i))) {
-          lamp.classList.add('on');
-        } else {
-          lamp.classList.remove('on');
-        }
+        (function(n){
+          var lamp = document.getElementById('lampma' + n);
+          if (value & (1 << (11 - i))) {
+            lamp.classList.add('on');
+          } else {
+            lamp.classList.remove('on');
+          }
+        })(i);
       }
     }
     function setMBRegisterValue(value) {
       for (var i = 0; i < 12; i++) {
-      var id = 'switchd' + i;
-        var lamp = document.getElementById(id);
-        if (value & (1 << (11 - i))) {
-          lamp.classList.add('on');
-        } else {
-          lamp.classList.remove('on');
-        }
+        (function(n){
+          var lamp = document.getElementById('lampmb' + n);
+          if (value & (1 << (11 - i))) {
+            lamp.classList.add('on');
+          } else {
+            lamp.classList.remove('on');
+          }
+        })(i);
       }
     }
     function setLRegisterValue(value) {
-      var id = 'switchd' + i;
-        var lamp = document.getElementById(id);
+        var lamp = document.getElementById('lampl');
         if (value) {
           lamp.classList.add('on');
         } else {
@@ -412,13 +427,14 @@
     }
     function setACRegisterValue(value) {
       for (var i = 0; i < 12; i++) {
-        var id = 'lampac' + i;
-        var lamp = document.getElementById(id);
-        if (value & (1 << (11 - i))) {
-          lamp.classList.add('on');
-        } else {
-          lamp.classList.remove('on');
-        }
+        (function(n){
+          var lamp = document.getElementById('lampac' + n);
+          if (value & (1 << (11 - i))) {
+            lamp.classList.add('on');
+          } else {
+            lamp.classList.remove('on');
+          }
+        })(i);
       }
     }
 
