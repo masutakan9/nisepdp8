@@ -105,6 +105,29 @@
     .control-button:hover {
       background-color: #888;
     }
+
+    .console {
+      text-align: left;
+      margin: 15px auto;
+      max-width: 1200px;
+    }
+    .key-input {
+      line-height: 21px;
+      margin: 10px auto;
+      }
+    .teleprinter-output p {
+      margin: 10px auto;
+    }
+    .teleprinter-output pre {
+      background-color: #cca;
+      color: #222;
+      overflow: auto;
+      padding: 1.5em;
+      font-size: 15px;
+      line-height: 21px;
+      margin: 10px auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -281,10 +304,27 @@
     <button class="control-button" id="step">SingStep</button>
   </div>
 
+  <div class="console">
+    <!-- コンソールプリンタ出力 -->
+    <div class="teleprinter-output">
+      <p>teleprinter output</p>
+      <pre id="teleprinter"></pre>
+    </div>
+
+    <!-- コンソールキー入力 -->
+    <div class="key-input">
+      key input <input type="text" id="keyinput" size="100">
+    </div>
+  </div>
+
   <script>
     var RUNFF = 0;
     var DF,IF,PC,MA,MB,L,AC,IR,I,Z;
     var FIELD = [];
+    var KEY_BUFFER;
+    var KEY_FLAG = 0;
+    var TELEPRINTER_BUFFER;
+    var TELEPRINTER_FLAG=0;
     for(var i=0; i<8; i++) {
       FIELD[i] = new Uint16Array(4096);
     }
@@ -462,24 +502,27 @@
       MB = FIELD[IF][MA];
       IR = MB >> 9;
 
-      I = MB & 256;   // indirect
-      Z = MB & 128;   // zero page
-
-      MA = (MA & 3968) + (MB & 127);  // 3968 = 07600
-      if (Z == 0) {
-        // zero page
-        MA = MA & 127;
-      }
-
       var fieldNo = IF;
-      if (I != 0) {
-        // DEFER state
-        // Autoindex Addressing (0010..0017)
-        if ((MA >= 8) && (MA <= 15)) {
-          FIELD[IF][MA]++;
+      if (IR <= 5) {    // AND,TAD,ISZ,DCA,JMS,JMP
+
+        I = MB & 256;   // indirect
+        Z = MB & 128;   // zero page
+
+        MA = (MA & 3968) + (MB & 127);  // 3968 = 07600
+        if (Z == 0) {
+          // zero page
+          MA = MA & 127;
         }
-        MA = FIELD[IF][MA];
-        fieldNo = DF;
+
+        if (I != 0) {
+          // DEFER state
+          // Autoindex Addressing (0010..0017)
+          if ((MA >= 8) && (MA <= 15)) {
+            FIELD[IF][MA]++;
+          }
+          MA = FIELD[IF][MA];
+          fieldNo = DF;
+        }
       }
       
       //EXECUTE state
@@ -490,18 +533,14 @@
           AC &= SENSE;
           break;
         case 1: // TAD
-          if (SENSE & 2048) {
-            SENSE = SENSE - 4096;
+          AC += SENSE;
+          if (AC & 4096) {
+            L = (~L) & 1;
           }
-          if (AC & 2048) {
-            AC = AC - 4096;
-          }
-          AC = AC + SENSE + L;
-          L = (AC & 4096) >> 12;
           AC &= 4095;
           break;
         case 2: // ISZ
-          SENSE = SENSE + 1;
+          SENSE = (SENSE + 1) & 4095;
           FIELD[fieldNo][MA] = SENSE;
           if (SENSE == 0) {
             PC = PC + 1;
@@ -519,6 +558,7 @@
           PC = MA;
           break;
         case 6: // IOT
+          doIOT(MB);
           break;
         case 7: // OPR
           if ((MB & 256) == 0) {
@@ -544,8 +584,13 @@
           break;
         default:
           console.log('illegal instruction: ' + IR);
+          regDump();
           break;
       }
+      if (RUNFF) {
+        setTimeout(doStep,0);
+      }
+      setLamp();
     }
     // OPR
     function doGroup1(m) {
@@ -562,7 +607,10 @@
         L = (~L) & 1;
       }
       if (m & 1) {  // IAC
-        AC = (AC + 1) & 4095;
+        AC |= L << 12;
+        AC = (AC + 1);
+        L = (AC & 4096) >> 12;
+        AC &= 4095;
       }
       if (m & 8) {  // RAR
         AC = AC | (L << 12);
@@ -599,7 +647,7 @@
           PC = PC + 1;
         }
       }
-      if (m & 8) {    // SNL
+      if (m & 16) {    // SNL
         if (L) {
           PC = PC + 1;
         }
@@ -654,7 +702,48 @@
       }
       if (m & 16) {   // MQL
       }
-      if (m & 814 {    // CODE 
+      if (m & 814) {  // CODE 
+      }
+    }
+    function doIOT(m) {
+      // device 03=input (KEY) 04=output(TELEPRINTER)
+      var kb, tp, ln, cc;
+      switch(m) {
+        case 3097:  // KSF 6031 Keyboard Skip if Flag
+          kb = document.getElementById('keyinput');
+          if (kb.value.length > 0) {
+            PC++;
+          }
+          break;
+        case 3098:  // KCC 6032 Keyboard Clear and read Character
+          //break;
+        case 3100:  // KRS 6034 Keybord Read Static
+          kb = document.getElementById('keyinput');
+          ln = kb.value;
+          if (ln.length > 0) {
+            cc = ln.charAt(0);
+            AC = (cc.charCodeAt(0)) & 255;
+            kb.value = ln.slice(1);
+          }
+          break;
+        case 3102:  // KRB 6036 Keybord Read and Begin next read
+          break;
+        case 3105:  // TSF 6041 Teleprinter Skip if Flag
+          PC++;
+          break;
+        case 3106:  // TCF 6042 Teleprinter Clear Flag
+          break;
+        case 3108:  // TPC 6044 Teleprinter Print Character
+          // fall-down
+          //break;
+        case 3110:  // TLS 6046 Teleprinter Load and Start
+          tp = document.getElementById('teleprinter');
+          tp.textContent += String.fromCharCode(AC & 255);
+          break;
+        default:
+          console.log('illegal instruction: ' + OCT2STR12(m));
+          regDump();
+          break;
       }
     }
     function regDump() {
@@ -681,9 +770,11 @@
       MA = PC;
       RUNFF = 1;
 
-      while (RUNFF == 1) {
-        doStep();
-      }
+      setTimeout(doStep, 0);
+      //while (RUNFF == 1) {
+      //  doStep();
+      //  setLamp();
+      //}
     });
 
     // 操作キー：LoadAdd
@@ -713,7 +804,8 @@
 
     // 操作キー：Cont (Continue)
     document.getElementById('cont').addEventListener('click', function() {
-      alert('Cont動作は未実装です');
+      RUNFF = 1;
+      setTimeout(doStep, 0);
     });
 
     // 操作キー：Stop
@@ -723,7 +815,8 @@
 
     // 操作キー：Step
     document.getElementById('step').addEventListener('click', function() {
-        doStep();
+      RUNFF = 0;
+      setTimeout(doStep, 0);
     });
 
   </script>
