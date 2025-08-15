@@ -313,7 +313,10 @@
 
     <!-- コンソールキー入力 -->
     <div class="key-input">
-      key input <input type="text" id="keyinput" size="100">
+      key input: <input type="text" id="keyinput" size="100">
+    </div>
+    <div class = "key-input">
+      tape image file: <input type="file" name="select" id="fileInput" />
     </div>
   </div>
 
@@ -722,7 +725,7 @@
           ln = kb.value;
           if (ln.length > 0) {
             cc = ln.charAt(0);
-            AC = (cc.charCodeAt(0)) & 255;
+            AC |= (cc.charCodeAt(0)) & 255;
             kb.value = ln.slice(1);
           }
           break;
@@ -738,7 +741,7 @@
           //break;
         case 3110:  // TLS 6046 Teleprinter Load and Start
           tp = document.getElementById('teleprinter');
-          tp.textContent += String.fromCharCode(AC & 255);
+          tp.textContent += String.fromCharCode(AC & 127);
           break;
         default:
           console.log('illegal instruction: ' + OCT2STR12(m));
@@ -818,6 +821,25 @@
       RUNFF = 0;
       setTimeout(doStep, 0);
     });
+
+    // tape image loader
+    var fileInput = document.getElementById('fileInput');
+    if (fileInput) {
+      fileInput.addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var arrayBuffer = e.target.result;
+          var uint8Array = new Uint8Array(arrayBuffer);
+          for (var i = 0; i < uint8Array.length; i++) {
+            var byte = uint8Array[i];
+            console.log('Byte ' + i + ': ' + byte);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
 
   </script>
 </body>
